@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>City Beyond 2050 | Smart Water Control</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(0, 220, 255, 0.12), transparent 30%),
+        radial-gradient(circle at 80% 70%, rgba(120, 70, 255, 0.12), transparent 30%),
+        #050914;
+    color: #eafaff;
+    font-family: Inter, sans-serif;
+    overflow-x: hidden;
+}
+
+/* Background grid */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.12;
+    background-image:
+        linear-gradient(rgba(0, 220, 255, .25) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 220, 255, .25) 1px, transparent 1px);
+    background-size: 45px 45px;
+}
+
+/* Main container */
+
+.dashboard {
+    width: min(1450px, 94%);
+    margin: auto;
+    padding: 28px 0 40px;
+}
+
+/* Header */
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.logo-area h1 {
+    font-family: Orbitron, sans-serif;
+    font-size: clamp(25px, 4vw, 48px);
+    letter-spacing: 3px;
+    background: linear-gradient(90deg, #52f5ff, #8e7cff, #ff72e6);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.logo-area p {
+    margin-top: 8px;
+    color: #7e9aaa;
+    letter-spacing: 2px;
+    font-size: 13px;
+}
+
+.connection {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 18px;
+    border: 1px solid rgba(80,230,255,.3);
+    background: rgba(8,20,35,.75);
+    border-radius: 14px;
+}
+
+.status-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #ff405d;
+    box-shadow: 0 0 12px #ff405d;
+}
+
+.status-dot.connected {
+    background: #45ffb0;
+    box-shadow: 0 0 15px #45ffb0;
+}
+
+.connection span {
+    font-family: Orbitron, sans-serif;
+    font-size: 11px;
+}
+
+/* Buttons */
+
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+
+button {
+    border: 1px solid rgba(70,220,255,.35);
+    background: rgba(15,30,48,.85);
+    color: #dffaff;
+    padding: 11px 17px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: .2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    background: rgba(25,60,85,.95);
+    box-shadow: 0 0 18px rgba(60,220,255,.2);
+}
+
+button.primary {
+    background: linear-gradient(90deg, #087f9d, #5641a8);
+}
+
+/* Status banner */
+
+.system-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 17px 20px;
+    margin-bottom: 22px;
+    border: 1px solid rgba(69,255,176,.25);
+    border-radius: 16px;
+    background: linear-gradient(90deg, rgba(10,50,48,.7), rgba(10,25,40,.7));
+}
+
+.system-left {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.big-status {
+    font-family: Orbitron, sans-serif;
+    color: #45ffb0;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.system-time {
+    color: #7893a3;
+    font-size: 12px;
+}
+
+/* Cards */
+
+.sensor-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 17px;
+    margin-bottom: 22px;
+}
+
+.card {
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+    min-height: 180px;
+    border: 1px solid rgba(80,200,255,.18);
+    border-radius: 18px;
+    background: linear-gradient(
+        145deg,
+        rgba(15,30,49,.94),
+        rgba(7,14,28,.94)
+    );
+    box-shadow: inset 0 0 25px rgba(70,190,255,.025);
+}
+
+.card::after {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    right: -45px;
+    top: -45px;
+    border-radius: 50%;
+    background: rgba(70,220,255,.08);
+    filter: blur(5px);
+}
+
+.card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #8fa9b9;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.icon {
+    font-size: 25px;
+}
+
+.value {
+    margin-top: 22px;
+    font-family: Orbitron, sans-serif;
+    font-size: 34px;
+    font-weight: 700;
+}
+
+.unit {
+    font-size: 14px;
+    color: #8aa5b5;
+}
+
+.card-status {
+    margin-top: 13px;
+    font-size: 12px;
+    color: #45ffb0;
+}
+
+.warning {
+    color: #ffd45c !important;
+}
+
+.danger {
+    color: #ff5470 !important;
+}
+
+/* Lower area */
+
+.lower-grid {
+    display: grid;
+    grid-template-columns: 1.4fr .9fr;
+    gap: 20px;
+}
+
+/* Water panel */
+
+.panel {
+    border: 1px solid rgba(80,200,255,.18);
+    border-radius: 18px;
+    background: rgba(7,15,29,.88);
+    padding: 23px;
+}
+
+.panel-title {
+    font-family: Orbitron, sans-serif;
+    letter-spacing: 1px;
+    font-size: 15px;
+    margin-bottom: 22px;
+}
+
+/* Water visualization */
+
+.water-system {
+    display: grid;
+    grid-template-columns: 1fr 160px 1fr;
+    align-items: center;
+    gap: 20px;
+}
+
+.system-node {
+    text-align: center;
+}
+
+.node-circle {
+    width: 86px;
+    height: 86px;
+    margin: auto;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    background: rgba(30,150,220,.12);
+    border: 1px solid rgba(50,220,255,.5);
+    box-shadow: 0 0 25px rgba(30,200,255,.12);
+}
+
+.node-name {
+    margin-top: 10px;
+    font-family: Orbitron, sans-serif;
+    font-size: 10px;
+    color: #9ab0bd;
+}
+
+.flow {
+    position: relative;
+    height: 6px;
+    background: rgba(70,150,180,.15);
+    border-radius: 10px;
+}
+
+.flow::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent 0 15px,
+        #45eaff 15px 25px
+    );
+    animation: flow 1s linear infinite;
+    opacity: .8;
+}
+
+@keyframes flow {
+    from { transform: translateX(-25px); }
+    to { transform: translateX(0); }
+}
+
+/* Water level */
+
+.water-level {
+    margin-top: 28px;
+}
+
+.level-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #91a8b6;
+    margin-bottom: 8px;
+}
+
+.level-bar {
+    height: 13px;
+    border-radius: 20px;
+    background: #0c1c29;
+    overflow: hidden;
+}
+
+.level-fill {
+    width: 72%;
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #22dfff, #657aff);
+    box-shadow: 0 0 16px rgba(50,220,255,.6);
+    transition: width .5s;
+}
+
+/* Activity */
+
+.activity {
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.log {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(100,160,180,.08);
+    font-size: 12px;
+    color: #9eb4c0;
+}
+
+.log strong {
+    color: #55eaff;
+    margin-right: 7px;
+}
+
+/* Footer */
+
+footer {
+    text-align: center;
+    margin-top: 28px;
+    color: #526d7c;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+/* Responsive */
+
+@media(max-width: 1000px) {
+    .sensor-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .lower-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width: 650px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sensor-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .water-system {
+        grid-template-columns: 1fr;
+    }
+
+    .flow {
+        transform: rotate(90deg);
+        margin: 20px auto;
+        width: 80px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+<header>
+    <div class="logo-area">
+        <h1>CITY BEYOND 2050</h1>
+        <p>AI SMART WATER CONTROL CENTER</p>
+    </div>
+
+    <div class="connection">
+        <div class="status-dot" id="connectionDot"></div>
+        <span id="connectionText">HC-06 OFFLINE</span>
+    </div>
+</header>
+
+<div class="controls">
+    <button class="primary" onclick="connectBluetooth()">
+        📡 CONNECT HC-06
+    </button>
+
+    <button onclick="toggleDemo()">
+        🧪 DEMO MODE
+    </button>
+
+    <button onclick="clearLogs()">
+        🗑 CLEAR LOG
+    </button>
+</div>
+
+<div class="system-status">
+    <div class="system-left">
+        <div style="font-size:25px">🟢</div>
+        <div>
+            <div class="big-status" id="overallStatus">
+                CITY SYSTEMS NOMINAL
+            </div>
+            <div class="system-time">
+                Autonomous water-management monitoring active
+            </div>
+        </div>
+    </div>
+
+    <div class="system-time" id="clock">
+        --:--:--
+    </div>
+</div>
+
+
+<!-- SENSOR CARDS -->
+
+<div class="sensor-grid">
+
+    <div class="card">
+        <div class="card-title">
+            <span>Temperature</span>
+            <span class="icon">🌡️</span>
+        </div>
+
+        <div class="value">
+            <span id="temperature">--</span>
+            <span class="unit">°C</span>
+        </div>
+
+        <div class="card-status" id="temperatureStatus">
+            WAITING FOR SENSOR
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-title">
+            <span>Rain Detection</span>
+            <span class="icon">🌧️</span>
+        </div>
+
+        <div class="value">
+            <span id="rain">--</span>
+            <span class="unit">%</span>
+        </div>
+
+        <div class="card-status" id="rainStatus">
+            WAITING FOR SENSOR
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-title">
+            <span>Soil Moisture</span>
+            <span class="icon">🌱</span>
+        </div>
+
+        <div class="value">
+            <span id="soil">--</span>
+            <span class="unit">%</span>
+        </div>
+
+        <div class="card-status" id="soilStatus">
+            WAITING FOR SENSOR
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-title">
+            <span>Flood Monitor</span>
+            <span class="icon">🌊</span>
+        </div>
+
+        <div class="value">
+            <span id="flood">--</span>
+            <span class="unit">cm</span>
+        </div>
+
+        <div class="card-status" id="floodStatus">
+            WAITING FOR SENSOR
+        </div>
+    </div>
+
+</div>
+
+
+<!-- LOWER PANELS -->
+
+<div class="lower-grid">
+
+    <div class="panel">
+
+        <div class="panel-title">
+            💧 SMART WATER MANAGEMENT NETWORK
+        </div>
+
+        <div class="water-system">
+
+            <div class="system-node">
+                <div class="node-circle">🌧️</div>
+                <div class="node-name">RAIN COLLECTION</div>
+            </div>
+
+            <div class="flow"></div>
+
+            <div class="system-node">
+                <div class="node-circle">💧</div>
+                <div class="node-name">SMART STORAGE</div>
+            </div>
+
+        </div>
+
+        <div class="water-level">
+
+            <div class="level-label">
+                <span>ESTIMATED WATER RESERVE</span>
+                <span id="waterPercent">72%</span>
+            </div>
+
+            <div class="level-bar">
+                <div class="level-fill" id="waterFill"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <div class="panel-title">
+            📜 LIVE SYSTEM ACTIVITY
+        </div>
+
+        <div class="activity" id="activityLog">
+
+            <div class="log">
+                <strong>SYSTEM</strong>
+                Dashboard initialized.
+            </div>
+
+            <div class="log">
+                <strong>SYSTEM</strong>
+                Waiting for HC-06 connection...
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<footer>
+    CITY BEYOND 2050 • GRADE 7 SMART SUSTAINABLE CITY • WATER MANAGEMENT SYSTEM
+</footer>
+
+</div>
+
+
+<script>
+
+let port = null;
+let reader = null;
+let demoRunning = false;
+
+
+/* CLOCK */
+
+function updateClock() {
+
+    const now = new Date();
+
+    document.getElementById("clock").textContent =
+        now.toLocaleTimeString();
+
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+
+/* CONNECTION UI */
+
+function setConnected(state) {
+
+    const dot = document.getElementById("connectionDot");
+    const text = document.getElementById("connectionText");
+
+    if (state) {
+
+        dot.classList.add("connected");
+        text.textContent = "HC-06 CONNECTED";
+
+    } else {
+
+        dot.classList.remove("connected");
+        text.textContent = "HC-06 OFFLINE";
+
+    }
+
+}
+
+
+/* ACTIVITY LOG */
+
+function addLog(message) {
+
+    const log = document.getElementById("activityLog");
+
+    const entry = document.createElement("div");
+
+    entry.className = "log";
+
+    entry.innerHTML =
+        "<strong>" +
+        new Date().toLocaleTimeString() +
+        "</strong>" +
+        message;
+
+    log.prepend(entry);
+
+    while (log.children.length > 12) {
+        log.removeChild(log.lastChild);
+    }
+
+}
+
+
+function clearLogs() {
+
+    document.getElementById("activityLog").innerHTML = "";
+
+    addLog("Activity log cleared.");
+
+}
+
+
+/* UPDATE TEMPERATURE */
+
+function updateTemperature(value) {
+
+    value = Number(value);
+
+    document.getElementById("temperature").textContent =
+        value.toFixed(1);
+
+    const status =
+        document.getElementById("temperatureStatus");
+
+    if (value >= 32) {
+
+        status.textContent = "HIGH TEMPERATURE";
+        status.className = "card-status warning";
+
+    } else {
+
+        status.textContent = "NORMAL";
+        status.className = "card-status";
+
+    }
+
+}
+
+
+/* UPDATE RAIN */
+
+function updateRain(value) {
+
+    value = Number(value);
+
+    document.getElementById("rain").textContent =
+        Math.round(value);
+
+    const status =
+        document.getElementById("rainStatus");
+
+    if (value > 60) {
+
+        status.textContent = "RAIN DETECTED";
+        status.className = "card-status";
+
+    } else {
+
+        status.textContent = "DRY CONDITIONS";
+        status.className = "card-status warning";
+
+    }
+
+}
+
+
+/* UPDATE SOIL */
+
+function updateSoil(value) {
+
+    value = Number(value);
+
+    document.getElementById("soil").textContent =
+        Math.round(value);
+
+    const status =
+        document.getElementById("soilStatus");
+
+    if (value < 35) {
+
+        status.textContent = "SOIL DRY";
+        status.className = "card-status warning";
+
+    } else {
+
+        status.textContent = "MOISTURE NORMAL";
+        status.className = "card-status";
+
+    }
+
+}
+
+
+/* UPDATE FLOOD */
+
+function updateFlood(value) {
+
+    value = Number(value);
+
+    document.getElementById("flood").textContent =
+        value.toFixed(1);
+
+    const status =
+        document.getElementById("floodStatus");
+
+    const overall =
+        document.getElementById("overallStatus");
+
+    if (value <= 10) {
+
+        status.textContent = "⚠ FLOOD RISK DETECTED";
+        status.className = "card-status danger";
+
+        overall.textContent = "⚠ FLOOD ALERT ACTIVE";
+        overall.style.color = "#ff5470";
+
+    } else {
+
+        status.textContent = "WATER LEVEL SAFE";
+        status.className = "card-status";
+
+        overall.textContent = "CITY SYSTEMS NOMINAL";
+        overall.style.color = "#45ffb0";
+
+    }
+
+}
+
+
+/* WATER LEVEL */
+
+function updateWater(value) {
+
+    value = Math.max(0, Math.min(100, Number(value)));
+
+    document.getElementById("waterPercent").textContent =
+        Math.round(value) + "%";
+
+    document.getElementById("waterFill").style.width =
+        value + "%";
+
+}
+
+
+/*
+------------------------------------------------
+BLUETOOTH / WEB SERIAL
+------------------------------------------------
+*/
+
+async function connectBluetooth() {
+
+    if (!("serial" in navigator)) {
+
+        alert(
+            "Web Serial is not supported in this browser. " +
+            "Try the latest Google Chrome or Microsoft Edge on the Acer laptop."
+        );
+
+        return;
+    }
+
+    try {
+
+        port = await navigator.serial.requestPort();
+
+        await port.open({
+            baudRate: 9600
+        });
+
+        setConnected(true);
+
+        addLog("HC-06 Bluetooth serial connection established.");
+
+        readSerial();
+
+    } catch (error) {
+
+        console.error(error);
+
+        addLog("Bluetooth connection cancelled or failed.");
+
+    }
+
+}
+
+
+/* READ SERIAL DATA */
+
+async function readSerial() {
+
+    const decoder = new TextDecoder();
+
+    let buffer = "";
+
+    while (port && port.readable) {
+
+        reader = port.readable.getReader();
+
+        try {
+
+            while (true) {
+
+                const { value, done } =
+                    await reader.read();
+
+                if (done) break;
+
+                buffer += decoder.decode(value);
+
+                const lines = buffer.split("\n");
+
+                buffer = lines.pop();
+
+                for (const line of lines) {
+
+                    processArduinoData(line.trim());
+
+                }
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+        } finally {
+
+            reader.releaseLock();
+
+        }
+
+        break;
+
+    }
+
+}
+
+
+/*
+------------------------------------------------
+ARDUINO DATA PARSER
+------------------------------------------------
+
+The dashboard understands:
+
+TEMP=33.2
+RAIN=75
+SOIL=60
+FLOOD=15
+
+OR:
+
+TEMP:33.2,RAIN:75,SOIL:60,FLOOD:15
+
+OR:
+
+33.2,75,60,15
+------------------------------------------------
+*/
+
+function processArduinoData(line) {
+
+    if (!line) return;
+
+    addLog("Received: " + line);
+
+    let tempMatch =
+        line.match(/TEMP\s*[:=]\s*(-?\d+\.?\d*)/i);
+
+    let rainMatch =
+        line.match(/RAIN\s*[:=]\s*(\d+\.?\d*)/i);
+
+    let soilMatch =
+        line.match(/SOIL\s*[:=]\s*(\d+\.?\d*)/i);
+
+    let floodMatch =
+        line.match(/FLOOD\s*[:=]\s*(\d+\.?\d*)/i);
+
+
+    if (tempMatch)
+        updateTemperature(tempMatch[1]);
+
+    if (rainMatch)
+        updateRain(rainMatch[1]);
+
+    if (soilMatch)
+        updateSoil(soilMatch[1]);
+
+    if (floodMatch)
+        updateFlood(floodMatch[1]);
+
+
+    /* Simple CSV support */
+
+    if (
+        !tempMatch &&
+        !rainMatch &&
+        !soilMatch &&
+        !floodMatch
+    ) {
+
+        const values =
+            line.split(",").map(Number);
+
+        if (values.length >= 4 &&
+            values.every(v => !isNaN(v))) {
+
+            updateTemperature(values[0]);
+            updateRain(values[1]);
+            updateSoil(values[2]);
+            updateFlood(values[3]);
+
+        }
+
+    }
+
+}
+
+
+/* DEMO MODE */
+
+let demoInterval = null;
+
+function toggleDemo() {
+
+    if (demoRunning) {
+
+        clearInterval(demoInterval);
+
+        demoRunning = false;
+
+        addLog("Demo mode stopped.");
+
+        return;
+    }
+
+    demoRunning = true;
+
+    addLog("Demo mode activated.");
+
+    function demoUpdate() {
+
+        const temperature =
+            30 + Math.random() * 5;
+
+        const rain =
+            30 + Math.random() * 65;
+
+        const soil =
+            40 + Math.random() * 45;
+
+        const flood =
+            11 + Math.random() * 12;
+
+        updateTemperature(temperature);
+        updateRain(rain);
+        updateSoil(soil);
+        updateFlood(flood);
+
+        updateWater(55 + Math.random() * 30);
+
+    }
+
+    demoUpdate();
+
+    demoInterval =
+        setInterval(demoUpdate, 2500);
+
+}
+
+</script>
+
+</body>
+</html>
